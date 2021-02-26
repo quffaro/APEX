@@ -1,9 +1,10 @@
 -- PROCEDURES 
 
 --- WRITE NEW TASK TO TASK TABLE
-create or replace procedure p_write_new_task_to_task_table 
+create or replace procedure p_app_write_new_task_to_task_table 
 (
     i_table in varchar2
+    ,i_app_code in varchar2
     ,i_pk_id in number 
     ,i_task_name in varchar2
     ,i_assigned_to in varchar2
@@ -14,7 +15,8 @@ begin
 insert into 
 app_tasks 
 (
-    task_source_table
+    app_code
+    ,task_source_table
     ,task_source_table_pk_id
     ,task_name
     ,status_id
@@ -24,7 +26,8 @@ app_tasks
 )
 values
 (
-    i_table
+    i_app_code
+    ,i_table
     ,i_pk_id
     ,i_task_name
     ,1 -- not started
@@ -52,19 +55,12 @@ begin
 end ; 
 /
 
---- ACCEPT TASK GIVEN REQUEST ID
-create or replace procedure p_app_accept_request_task
-(
-    i_request_id in number
-)
-as 
-o_task_id number ;
-begin 
-    select task_id into o_task_id from test_tasks
-        where 
-        task_source_table_pk_id = i_request_id and 
-        task_source_table = 'TEST REQUESTS';
 
-    --dbms_output.put_line(o_task_id);
-    p_app_accept_task(o_task_id);
-end;
+
+
+create or replace function f_get_current_user_id
+return number 
+is 
+begin 
+	return apex_util.get_current_user_id ;
+end ;
